@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from src.metrics.models import Metric as MetricDB
 from src.metrics.schemas import Metric as MetricPY
+from src.metrics.schemas import AverageSearch as AVGS
 from src.metrics import cruds
 
 
@@ -97,4 +98,48 @@ class TestCruds:
         date = datetime(2023, 4, 5, 1, 4, 6)
         timestamp = cruds.timestamp_to_int(date.timestamp())
         response = cruds.average_metrics_by_minute(metrics_db, timestamp)
+        assert len(response) == 0
+
+    def test_average_metrics_by_search_year(self, metrics_db: Session):
+        date = datetime(2022, 4, 5, 1, 4, 6)
+        timestamp = cruds.timestamp_to_int(date.timestamp())
+        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.year)
+        assert len(response) == 2
+        for res in response:
+            if 'uno' in res.keys():
+                assert res['uno'] == 22.95
+            if 'dos' in res.keys():
+                assert res['dos'] == 3.5
+        timestamp = int(datetime(2023, 4, 5, 1, 4, 6).timestamp() * 1000)
+        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.year)
+        assert len(response) == 0
+
+    def test_average_metrics_by_search_hour(self, metrics_db: Session):
+        date = datetime(2022, 1, 1, 1, 1, 1)
+        timestamp = cruds.timestamp_to_int(date.timestamp())
+        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.hour)
+        assert len(response) == 2
+        for res in response:
+            if 'uno' in res.keys():
+                assert res['uno'] == 22.95
+            if 'dos' in res.keys():
+                assert res['dos'] == 3.5
+        date = datetime(2023, 4, 5, 1, 4, 6)
+        timestamp = cruds.timestamp_to_int(date.timestamp())
+        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.hour)
+        assert len(response) == 0
+
+    def test_average_metrics_by_search_minute(self, metrics_db: Session):
+        date = datetime(2022, 1, 1, 1, 1, 1)
+        timestamp = cruds.timestamp_to_int(date.timestamp())
+        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.minute)
+        assert len(response) == 2
+        for res in response:
+            if 'uno' in res.keys():
+                assert res['uno'] == 22.95
+            if 'dos' in res.keys():
+                assert res['dos'] == 3.5
+        date = datetime(2023, 4, 5, 1, 4, 6)
+        timestamp = cruds.timestamp_to_int(date.timestamp())
+        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.minute)
         assert len(response) == 0

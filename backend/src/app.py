@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .db.database import engine, SessionLocal
+from .db.database import engine
 from .metrics.routes import router as router_metrics
 from .metrics import models as models_metrics
 # DB

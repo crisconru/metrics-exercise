@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel
 
 
@@ -8,3 +9,9 @@ class Metric(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class AverageSearch(str, Enum):
+    year = 'year'
+    hour = 'hour'
+    minute = 'minute'
