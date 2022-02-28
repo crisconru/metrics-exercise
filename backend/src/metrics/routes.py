@@ -1,8 +1,11 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
 from ..dependencies import get_db
 from . import schemas
-from .crud import get_metrics, create_metrics
+from .cruds import get_metrics, create_metrics
 
 router = APIRouter()
 
@@ -17,7 +20,7 @@ def get_all_metrics(db: Session = Depends(get_db)):
 
 
 @router.post('/')
-def post_metrics(metrics: list[schemas.Metric], db: Session = Depends(get_db)):
+def post_metrics(metrics: List[schemas.Metric], db: Session = Depends(get_db)):
     create_metrics(db, metrics)
     return {
         'message': 'Metrics inserted correctly'
