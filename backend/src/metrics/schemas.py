@@ -12,6 +12,6 @@ class Metric(BaseModel):
 
 
 class AverageSearch(str, Enum):
-    year = 'year'
+    day = 'day'
     hour = 'hour'
     minute = 'minute'

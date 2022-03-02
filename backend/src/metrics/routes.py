@@ -14,7 +14,7 @@ router = APIRouter()
 @router.get('/')
 def get_all_metrics(db: Session = Depends(get_db)):
     return {
-        'metrics': cruds.get_metrics(db)
+        'metrics': cruds.get_metrics_by_name(db)
     }
 
 
@@ -22,14 +22,15 @@ def get_all_metrics(db: Session = Depends(get_db)):
 def post_metrics(metrics: List[MetricPY], db: Session = Depends(get_db)):
     cruds.create_metrics(db, metrics)
     return {
-        'message': 'Metrics inserted correctly'
+        'message': 'Metrics inserted correctly',
+        'metrics': cruds.get_metrics_by_name(db)
     }
 
 
 @router.get('/average/{timestamp}')
 def average_metrics(
     timestamp: int,
-    avg_search: AVGSearch = AVGSearch.year,
+    search: AVGSearch = AVGSearch.day,
     db: Session = Depends(get_db)
 ):
     if timestamp < 0:
@@ -39,5 +40,6 @@ def average_metrics(
         )
     return {
         'timestamp': timestamp,
-        'averages': cruds.average_metrics_by(db, timestamp, avg_search)
+        'search': search,
+        'averages': cruds.average_metrics_by(db, timestamp, search)
     }
