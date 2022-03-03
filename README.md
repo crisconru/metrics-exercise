@@ -8,21 +8,21 @@ The project is far to be functional and completed. The author is not proud with 
 
 Backend is more or less completed:
 
-[x] Gets metrics.
-[x] Post metrics to backend.
-[x] Get averages of metrics by day, hour, minute with a timestamp.
-[] Websocket to have realtime communication.
+- [x] Gets metrics.
+- [x] Post metrics to backend.
+- [x] Get averages of metrics by day, hour, minute with a timestamp.
+- [] Websocket to have realtime communication.
 
 API has an OpenAPI docs at the endpoins `/docs` and `/redoc`.
 
 Frontend is incompleted:
 
-[x] Gets metrics.
-[x] Post metrics.
-[] Get averages of metrics by day, hour, minute with a timestamp (this goal is half done).
-[] Display averages in an usable way (like a Time-Series chart).
-[] UI not horrible and responsive.
-[] Websocket to have realtime updates of the averages.
+- [x] Gets metrics.
+- [x] Post metrics.
+- [] Get averages of metrics by day, hour, minute with a timestamp (this goal is half done).
+- [] Display averages in an usable way (like a Time-Series chart).
+- [] UI not horrible and responsive.
+- [] Websocket to have realtime updates of the averages.
 
 The project can be run in two ways:
 
