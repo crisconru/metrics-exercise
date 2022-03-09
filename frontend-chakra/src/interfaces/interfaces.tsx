@@ -36,7 +36,7 @@ export interface AveragesFetched {
 }
 
 export interface AverageDataAxis {
-    x: number,
+    x: Date,
     y: number
 }
 

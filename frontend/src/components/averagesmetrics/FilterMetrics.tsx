@@ -1,5 +1,6 @@
 import { ChangeEvent, useRef, useState } from "react"
 import { AveragesData } from "../../context/MetricsContext"
+import { SearchFilter } from "../../interfaces/interfaces"
 
 interface Props {
   handleSubmit: (search: AveragesData) => void
@@ -8,10 +9,14 @@ interface Props {
 
 const FilterMetrics = ({handleSubmit}: Props) => {
 
-  const [timeFilter, setTimeFilter] = useState('')
+  const [timeFilter, setTimeFilter] = useState(SearchFilter.Day)
 
   const onTimeFilter = ({target}: ChangeEvent<HTMLInputElement>) => {
-    setTimeFilter(target.value)
+    if (
+      target.value === SearchFilter.Day ||
+      target.value === SearchFilter.Hour ||
+      target.value === SearchFilter.Minute
+    ) { setTimeFilter(target.value) }
   }
 
   const timestamp = useRef<HTMLInputElement>(null)
@@ -30,15 +35,15 @@ const FilterMetrics = ({handleSubmit}: Props) => {
   return (
     <form onSubmit={onSubmit}>
       <p>Time filter:</p>
-
-      <label htmlFor="minute">Minute</label>
-      <input type="radio" id="minute" name="time_filter" value="minute" onChange={onTimeFilter} required/>
-      
-      <label htmlFor="hour">Hour</label>
-      <input type="radio" id="hour" name="time_filter" value="hour" onChange={onTimeFilter} required/>
       
       <label htmlFor="day">Day</label>
-      <input type="radio" id="day" name="time_filter" value="day" onChange={onTimeFilter} required/>
+      <input type="radio" id="day" name="time_filter" value={SearchFilter.Day} onChange={onTimeFilter} required/>
+      
+      <label htmlFor="hour">Hour</label>
+      <input type="radio" id="hour" name="time_filter" value={SearchFilter.Hour} onChange={onTimeFilter} required/>
+
+      <label htmlFor="minute">Minute</label>
+      <input type="radio" id="minute" name="time_filter" value={SearchFilter.Minute} onChange={onTimeFilter} required/>
 
       <br />
 

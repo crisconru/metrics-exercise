@@ -14,16 +14,11 @@ const AddMetrics = () => {
 
   const selectMetric = ({target}: ChangeEvent<HTMLSelectElement>) => {
     const value = target.value
-    console.log(value)
     const metricSelected = (context.metrics.includes(value)) ? value : ''
     context.setSelectedMetric(metricSelected)
   }
 
-  const onMetric = (m: Metric) => {
-    console.log('metrica')
-    console.log(m)
-    context.postMetrics([m])
-  }
+  const onMetric = (m: Metric) => { context.postMetrics([m]) }
 
   return (
     <>

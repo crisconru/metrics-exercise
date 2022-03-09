@@ -7,10 +7,7 @@ interface Props {
 
 const ANOTHER = 'another'
 
-const MetricsList = ( {metrics, handleChange}: Props ) => {
-
-  console.log('render list')
-  
+const MetricsList = ( {metrics, handleChange}: Props ) => {  
   return (
     <select onChange = {handleChange}>
       {metrics.map( metric => <option key={metric}>{metric}</option> )}
