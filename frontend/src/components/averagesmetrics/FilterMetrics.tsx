@@ -1,54 +1,32 @@
-import { ChangeEvent, useRef, useState } from "react"
-import { AveragesData } from "../../context/MetricsContext"
+import { Flex } from "@chakra-ui/react"
+import { SearchFilter } from "../../interfaces/interfaces"
+import DatesAverage from "./DatesAverage"
+import RadioAverage from "./RadioAverage"
+
 
 interface Props {
-  handleSubmit: (search: AveragesData) => void
+  start: Date,
+  end: Date,
+  search: SearchFilter
+  onChange: (start: Date, end: Date, search: SearchFilter) => void
 }
 
 
-const FilterMetrics = ({handleSubmit}: Props) => {
+const FilterMetrics = (props: Props) => {
 
-  const [timeFilter, setTimeFilter] = useState('')
-
-  const onTimeFilter = ({target}: ChangeEvent<HTMLInputElement>) => {
-    setTimeFilter(target.value)
+  const onSearch = (search: SearchFilter) => {
+    props.onChange(props.start, props.end, search)
   }
 
-  const timestamp = useRef<HTMLInputElement>(null)
-
-  const onSubmit = (e: ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (timestamp.current !== null) {
-      const data: AveragesData = {
-        timeFilter,
-        timestamp: new Date(timestamp.current.value).getTime(),
-      }
-      handleSubmit(data)
-    }
+  const onDates = (start: Date, end: Date) => {
+    props.onChange(start, end, props.search)
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <p>Time filter:</p>
-
-      <label htmlFor="minute">Minute</label>
-      <input type="radio" id="minute" name="time_filter" value="minute" onChange={onTimeFilter} required/>
-      
-      <label htmlFor="hour">Hour</label>
-      <input type="radio" id="hour" name="time_filter" value="hour" onChange={onTimeFilter} required/>
-      
-      <label htmlFor="day">Day</label>
-      <input type="radio" id="day" name="time_filter" value="day" onChange={onTimeFilter} required/>
-
-      <br />
-
-      <label htmlFor="time_init">Time</label>
-      <input ref={timestamp} type="datetime-local" id="time_init" name="time_init" required/>
-
-      <br />
-
-      <input type="submit" value='Get Metrics'/>
-    </form>
+    <Flex flexDirection={{ base: 'column', sm: 'row' }} justifyContent='center'>
+      <RadioAverage defaultValue={SearchFilter.Day} onChange={onSearch} />
+      <DatesAverage start={props.start} end={props.end} onChange={onDates}/>
+    </Flex>
   )
 }
 

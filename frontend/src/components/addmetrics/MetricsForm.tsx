@@ -1,45 +1,91 @@
-import { SyntheticEvent, useRef } from "react";
+import { ChangeEvent, SyntheticEvent, useContext, useEffect, useState } from "react";
+import { MetricsContext } from "../../context/MetricsContext";
 import { Metric } from "../../interfaces/interfaces";
+import MetricsInputName from "./MetricsInputName";
+import MetricsInputValue from "./MetricsInputValue";
+import MetricsSelectMetric from "./MetricsSelectMetric";
+import MetricsSubmit from "./MetricsSubmit";
 
-interface Props {
-    selectedName: string,
-    onMetric: (m: Metric) => void
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css";
+
+interface State {
+  name: string
+  value: string
+  timestamp: number
 }
 
-export const MetricsForm = ({selectedName, onMetric}: Props) => {
+const INITIAL_STATE: State = {
+  name: '',
+  value: '',
+  timestamp: new Date().getTime()
+}
 
-  const name = useRef<HTMLInputElement>(null)
-  const value = useRef<HTMLInputElement>(null)
-  const timestamp = useRef<HTMLInputElement>(null)
+export const MetricsForm = () => {
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    
-    const m = {
-        name: (name.current) ? name.current.value : '',
-        value: (value.current) ? parseFloat(value.current.value) : 0.0,
-        timestamp: (timestamp.current)
-          ? new Date(timestamp.current.value).getTime()
-          : 0
+  const context = useContext(MetricsContext)
+
+  useEffect(() => {
+    context.getMetrics()
+  }, [])
+
+  const [state, setState] = useState<State>(INITIAL_STATE)
+
+  useEffect(() => {
+    setState(INITIAL_STATE)
+  }, [context.metrics])
+
+  const isInMetrics = (v: string) => {
+    if (!!context.metrics.metrics) return context.metrics.metrics.includes(v)
+    return false
+  }
+  // Select
+  const onChangeMetric = ({target}: ChangeEvent<HTMLSelectElement>) => {
+    const v = target.value
+    const metricSelected = isInMetrics(v) ? v : ''
+    setState({...state, name: metricSelected})
+  }
+  // Name
+  const isValidName = () => state.name !== ''
+  const onChangeName = (e: ChangeEvent<HTMLInputElement>) => setState({...state, name: e.target.value})
+  // Value
+  const isValidValue = () => (state.value !== '') && (!isNaN(parseFloat(state.value)))
+  const onChangeValue = (v: string) => setState({...state, value: v})
+  // Timestamp
+  const [datestring, setDatestring] = useState('')
+  const isValidTimestamp = () => (state.timestamp >= 0)
+  const onChangeTimestamp = (date: Date) => setDatestring(date.toString())
+  useEffect(() => {
+    if (datestring !== '') setState({...state, timestamp: new Date(datestring).getTime()})
+  }, [datestring])
+  // Form
+  const onMetric = (m: Metric) => { context.postMetrics([m]) }
+
+  const handleSubmit = (e: SyntheticEvent<HTMLButtonElement>) => {
+    if (isValidName() && isValidValue() && isValidTimestamp()) {
+      console.log('formulario válido')
+      const m: Metric = {
+          name: state.name,
+          value: parseFloat(state.value),
+          timestamp: state.timestamp
+      }
+      onMetric(m)
     }
-    onMetric(m)
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="Name">Name</label>
-      {selectedName
-        ? <input ref={name} type="text" name="Name" id="Name" value={selectedName}/>
-        : <input ref={name} type="text" name="Name" id="Name" required />
-      }
-      <br />
-      <label htmlFor="Value">Value</label>
-      <input ref={value} type="number" name="Value" id="Value" step={0.01} required />
-      <br />
-      <label htmlFor="Timestamp">Timestamp</label>
-      <input ref={timestamp} type="datetime-local" name="Timestamp" id="Timestamp"  step="1" required />
-      <br />
-      <input type="submit" value="ADD" />
-    </form>
+    <>
+      <MetricsSelectMetric metrics={context.metrics.metrics} onChange={onChangeMetric} />
+      <MetricsInputName isError={!isValidName()} metric={state.name} onChange={onChangeName} readOnly={isInMetrics(state.name)}/>
+      <MetricsInputValue isError={!isValidValue()} value={state.value} onChange={onChangeValue} />
+      <DatePicker
+        selected={new Date(state.timestamp)}
+        onChange={onChangeTimestamp}
+        showTimeSelect
+        dateFormat="Pp"
+        timeFormat="p"
+        timeIntervals={1}/>
+      <MetricsSubmit onSubmit={handleSubmit} />
+    </>
   )
 }

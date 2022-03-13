@@ -6,5 +6,4 @@ PORT = int(getenv('APP_PORT', 8000))
 
 if __name__ == '__main__':
     import uvicorn
-    from src import app
-    uvicorn.run(app=app, port=PORT)
+    uvicorn.run('src.app:app', port=PORT, host='0.0.0.0', reload=True)

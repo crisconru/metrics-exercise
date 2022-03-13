@@ -7,18 +7,20 @@ from .metrics import models as models_metrics
 models_metrics.Base.metadata.create_all(bind=engine)
 # Routes
 app = FastAPI()
-app.include_router(router=router_metrics, prefix='/metrics')
 # CORS
 origins = [
     "http://localhost:3000",
     "http://localhost",
+    "http://frontend",
+    "http://frontend:3000",
+    "http://frontend:3333",
     "frontend",
     "frontend:3000",
     "frontend:3333"
 ]
-
 app.add_middleware(
     CORSMiddleware,
+    # allow_origins=[origins],
     allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
@@ -29,3 +31,6 @@ app.add_middleware(
 @app.get("/")
 async def hello():
     return {"message": "Hello World"}
+
+
+app.include_router(router=router_metrics, prefix='/metrics')
