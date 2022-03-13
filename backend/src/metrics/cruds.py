@@ -40,11 +40,23 @@ def get_metrics(db: Session) -> List[MetricDB]:
 
 
 def get_metrics_by_name(db: Session) -> List[str]:
-    return db.\
+    mts = db.\
         query(MetricDB.name).\
         group_by(MetricDB.name).\
         order_by(MetricDB.name).\
         all()
+    return [i['name'] for i in mts]
+
+
+def get_total_metrics(db: Session) -> int:
+    return db.query(MetricDB).count()
+
+
+def get_timestamp_limits(db: Session) -> Tuple[int, int]:
+    return db.query(
+        func.min(MetricDB.timestamp),
+        func.max(MetricDB.timestamp)
+    ).first()
 
 
 def timestamp_to_int(timestamp: float) -> int:
@@ -55,28 +67,28 @@ def int_to_timestamp(timestamp: int) -> datetime:
     return datetime.fromtimestamp(timestamp / 1000)
 
 
-def _bounded_timestamps(
-    timestamp: int, search: AVGS = AVGS.day
-) -> Tuple[int, int]:
-    date = int_to_timestamp(timestamp)
-    year = date.year
-    month = date.month
-    day = date.day
-    if search in [AVGS.hour, AVGS.minute]:
-        hour = date.hour
-        if search == AVGS.minute:
-            minute = date.minute
-            t_min = datetime(year, month, day, hour, minute).timestamp()
-            t_max = datetime(year, month, day, hour, minute + 1).timestamp()
-        else:
-            t_min = datetime(year, month, day, hour).timestamp()
-            t_max = datetime(year, month, day, hour + 1).timestamp()
-    else:
-        t_min = datetime(year, month, day).timestamp()
-        t_max = datetime(year, month, day + 1).timestamp()
-    time_min = timestamp_to_int(t_min)
-    time_max = timestamp_to_int(t_max)
-    return (time_min, time_max)
+# def _bounded_timestamps(
+#     timestamp: int, search: AVGS = AVGS.day
+# ) -> Tuple[int, int]:
+#     date = int_to_timestamp(timestamp)
+#     year = date.year
+#     month = date.month
+#     day = date.day
+#     if search in [AVGS.hour, AVGS.minute]:
+#         hour = date.hour
+#         if search == AVGS.minute:
+#             minute = date.minute
+#             t_min = datetime(year, month, day, hour, minute).timestamp()
+#             t_max = datetime(year, month, day, hour, minute + 1).timestamp()
+#         else:
+#             t_min = datetime(year, month, day, hour).timestamp()
+#             t_max = datetime(year, month, day, hour + 1).timestamp()
+#     else:
+#         t_min = datetime(year, month, day).timestamp()
+#         t_max = datetime(year, month, day + 1).timestamp()
+#     time_min = timestamp_to_int(t_min)
+#     time_max = timestamp_to_int(t_max)
+#     return (time_min, time_max)
 
 
 def _get_metrics_between_timestamps(db: Session, min: int, max: int):
@@ -96,8 +108,11 @@ def average_metrics(db: Session, t_min: int, t_max: int, t_step: int):
         db_data = _get_metrics_between_timestamps(db, t_slot, t_limit)
         if len(db_data) > 0:
             for name, avg in db_data:
-                aux_data[name] = aux_data[name].append((t_slot, avg)) \
-                    if name in aux_data else [(t_slot, avg)]
+                if name in aux_data:
+                    # aux_data[name] = aux_data[name].append((t_slot, avg))
+                    aux_data[name].append((t_slot, avg))
+                else:
+                    aux_data[name] = [(t_slot, avg)]
         t_slot = t_limit
     for key, value in aux_data.items():
         average_data.append({
@@ -112,16 +127,26 @@ def _step_in_miliseconds(step: float) -> int:
 
 
 get_step = {
-    AVGS.day: _step_in_miliseconds(timedelta(hours=1).total_seconds()),
-    AVGS.hour: _step_in_miliseconds(timedelta(minutes=1).total_seconds()),
-    AVGS.minute: _step_in_miliseconds(timedelta(seconds=1).total_seconds())
+    AVGS.day: _step_in_miliseconds(timedelta(days=1).total_seconds()),
+    AVGS.hour: _step_in_miliseconds(timedelta(hours=1).total_seconds()),
+    AVGS.minute: _step_in_miliseconds(timedelta(minutes=1).total_seconds())
 }
 
 
-def average_metrics_by(
-    db: Session, timestamp: int,
-    search: AVGS
+# def average_metrics_by(
+#     db: Session, timestamp: int,
+#     search: AVGS
+# ) -> List[dict]:
+#     time_min, time_max = _bounded_timestamps(timestamp, search)
+#     time_step = get_step[search]
+#     return average_metrics(db, time_min, time_max, time_step)
+
+
+def get_average_metrics(
+    db: Session,
+    search: AVGS,
+    start: int,
+    end: int
 ) -> List[dict]:
-    time_min, time_max = _bounded_timestamps(timestamp, search)
-    time_step = get_step[search]
-    return average_metrics(db, time_min, time_max, time_step)
+    step = get_step[search]
+    return average_metrics(db, start, end, step)

@@ -13,33 +13,50 @@ router = APIRouter()
 
 @router.get('/')
 def get_all_metrics(db: Session = Depends(get_db)):
+    metrics = cruds.get_metrics_by_name(db)
+    (first_timestamp, last_timestamp) = cruds.get_timestamp_limits(db)
+    total = cruds.get_total_metrics(db)
     return {
-        'metrics': cruds.get_metrics_by_name(db)
+        'metrics': metrics,
+        'firstTimestamp': first_timestamp,
+        'lastTimestamp': last_timestamp,
+        'total': total
     }
 
 
 @router.post('/')
 def post_metrics(metrics: List[MetricPY], db: Session = Depends(get_db)):
     cruds.create_metrics(db, metrics)
+    mtrcs = cruds.get_metrics_by_name(db)
+    (first_timestamp, last_timestamp) = cruds.get_timestamp_limits(db)
+    total = cruds.get_total_metrics(db)
     return {
         'message': 'Metrics inserted correctly',
-        'metrics': cruds.get_metrics_by_name(db)
+        'metrics': mtrcs,
+        'firstTimestamp': first_timestamp,
+        'lastTimestamp': last_timestamp,
+        'total': total
     }
 
 
-@router.get('/average/{timestamp}')
+@router.get('/average/')
 def average_metrics(
-    timestamp: int,
+    start: int,
+    end: int,
     search: AVGSearch = AVGSearch.day,
     db: Session = Depends(get_db)
 ):
-    if timestamp < 0:
+    t_start = start if start <= end else end
+    t_end = end if start <= end else start
+    if t_start < 0:
         raise HTTPException(
             status_code=404,
             detail='timestamp must be a positive integer'
         )
+    data = cruds.get_average_metrics(db, search, t_start, t_end)
     return {
-        'timestamp': timestamp,
+        'start': t_start,
+        'end': t_end,
         'search': search,
-        'averages': cruds.average_metrics_by(db, timestamp, search)
+        'averages': data
     }

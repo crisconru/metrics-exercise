@@ -81,10 +81,28 @@ class TestCruds:
         else:
             assert False
 
-    def test_average_metrics_by_day(self, metrics_db: Session):
-        date = datetime(2022, 2, 3, 10, 11, 12)
-        timestamp = cruds.timestamp_to_int(date.timestamp())
-        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.day)
+    # def test_average_metrics_by_day(self, metrics_db: Session):
+    #     date = datetime(2022, 2, 3, 10, 11, 12)
+    #     timestamp = cruds.timestamp_to_int(date.timestamp())
+    #     response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.day)
+    #     assert len(response) == 2
+    #     for elem in response:
+    #         print('elem')
+    #         print(elem)
+    #         if elem['name'] == 'uno':
+    #             assert math.isclose(elem['averages'][0][1], 2.15)
+    #         if elem['name'] == 'dos':
+    #             assert math.isclose(elem['averages'][0][1], 3.85)
+    #     timestamp = int(datetime(2023, 4, 5, 1, 4, 6).timestamp() * 1000)
+    #     response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.day)
+    #     assert len(response) == 0
+
+    def test_get_average_metrics(self, metrics_db: Session):
+        date_start = datetime(2022, 2, 3, 10, 11, 12)
+        date_end = datetime(2022, 2, 4, 10, 11, 12)
+        start = cruds.timestamp_to_int(date_start.timestamp())
+        end = cruds.timestamp_to_int(date_end.timestamp())
+        response = cruds.get_average_metrics(metrics_db, AVGS.day, start, end)
         assert len(response) == 2
         for elem in response:
             print('elem')
@@ -93,6 +111,8 @@ class TestCruds:
                 assert math.isclose(elem['averages'][0][1], 2.15)
             if elem['name'] == 'dos':
                 assert math.isclose(elem['averages'][0][1], 3.85)
-        timestamp = int(datetime(2023, 4, 5, 1, 4, 6).timestamp() * 1000)
-        response = cruds.average_metrics_by(metrics_db, timestamp, AVGS.day)
+        t_start = int(datetime(2023, 4, 5, 1, 4, 6).timestamp() * 1000)
+        t_end = int(datetime(2023, 4, 6, 1, 4, 6).timestamp() * 1000)
+        response = cruds.get_average_metrics(
+            metrics_db, AVGS.day, t_start, t_end)
         assert len(response) == 0
