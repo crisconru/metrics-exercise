@@ -8,7 +8,7 @@ interface Props {
 export const MetricsSubmit = ({onSubmit}: Props) => {
   return (
     <FormControl>
-      <Button type="submit" colorScheme='green' w='100%' onClick={onSubmit}>ADD</Button>
+      <Button type="submit" colorScheme='brand' w='100%' onClick={onSubmit}>ADD</Button>
     </FormControl>
   )
 }

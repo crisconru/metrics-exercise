@@ -1,47 +1,54 @@
 import { useState } from "react"
-import { Metric } from "../interfaces/interfaces"
-
-
-interface MetricFetched {
-    name: string
-}
+import { Metric, MetricsState } from "../interfaces/interfaces"
 
 interface MetricsFetched {
-    metrics: MetricFetched[]
+  message: string,
+  metrics: string[]
+  firstTimestamp: number,
+  lastTimestamp: number,
+  total: number
 }
 
 export const useMetrics = (url: string) => {
 
-    const [metrics, setMetrics] = useState<string[]>([])
+  const [metrics, setMetrics] = useState<MetricsState>({} as MetricsState)
 
-    const getMetrics = () => {
-        const loadMetrics = async () => {
-            const res = await fetch(url)
-            const json: MetricsFetched = await res.json()
-            const ms = json.metrics.map(m => m.name)
-            setMetrics(ms)
-        }
-        loadMetrics()
+  const getMetrics = () => {
+    const loadMetrics = async () => {
+      const response = await fetch(url)
+      const res: MetricsFetched = await response.json()
+      console.log()
+      
+      setMetrics({
+        metrics: res.metrics,
+        minTimestamp: res.firstTimestamp,
+        maxTimestamp: res.lastTimestamp,
+        total: res.total
+      })
     }
+    loadMetrics()
+  }
 
-    const postMetrics = (mtcs: Metric[]) => {
-        const pushMetrics = async () => {
-            const fetchOptions = {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(mtcs)
-            }
-            const respose = await fetch(url, fetchOptions)
-            const res = await respose.json()
-            if (res.hasOwnProperty('metrics')) {
-              const newMetrics: string[] = res.metrics.map((m: MetricFetched) => m.name)
-              setMetrics(newMetrics)
-            }
-          }
-          pushMetrics()
+  const postMetrics = (mtcs: Metric[]) => {
+    const pushMetrics = async () => {
+      const fetchOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mtcs)
+      }
+      const response = await fetch(url, fetchOptions)
+      const res: MetricsFetched = await response.json()
+      setMetrics({
+        metrics: res.metrics,
+        minTimestamp: res.firstTimestamp,
+        maxTimestamp: res.lastTimestamp,
+        total: res.total
+      })
     }
+    pushMetrics()
+  }
 
-    return { metrics, getMetrics , postMetrics }
+  return { metrics, getMetrics, postMetrics }
 }

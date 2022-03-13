@@ -1,3 +1,4 @@
+import { Center } from '@chakra-ui/react';
 import {
   XYPlot, 
   VerticalGridLines, HorizontalGridLines, XAxis, YAxis,
@@ -18,15 +19,21 @@ const Chart = ({info, timestamps}: Props) => {
   
   const items = (!!info) ? info.map(d => <LineMarkSeries key={d.title} data={d.data} />) : null
 
+  // const domain = [0, timestamps.length]
+  const domain = [new Date(timestamps[0]), new Date(timestamps.slice(-1)[0])]
+
   return (
-    <XYPlot height={300} width={300} xDomain={[0, timestamps.length]}>
-      { !!items && <DiscreteColorLegend items={info} orientation='horizontal'/> }
-      { !!items && items }
-      <VerticalGridLines />
-      <HorizontalGridLines />
-      <XAxis title='timestamps' />
-      <YAxis title='averages' />
-    </XYPlot>
+    <Center>
+      {/* <XYPlot height={300} width={300} xDomain={[0, timestamps.length]}> */}
+      <XYPlot height={300} width={300} xType='time' xDomain={domain}>
+        { !!items && items }
+        <VerticalGridLines />
+        <HorizontalGridLines />
+        <XAxis title='timestamps' />
+        <YAxis title='averages' />
+      </XYPlot>
+      { !!items && <DiscreteColorLegend items={info} orientation='vertical'/> }
+    </Center>
   )
 }
 

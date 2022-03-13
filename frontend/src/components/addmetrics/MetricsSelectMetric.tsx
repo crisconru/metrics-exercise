@@ -13,8 +13,8 @@ const MetricsSelectMetric = ( {metrics, onChange}: Props ) => {
     <FormControl isRequired>
       <FormLabel htmlFor="selected">Select a metric</FormLabel>
       <Select id="selected" placeholder='Select option' onChange={onChange}>
-        <option key={ANOTHER}>Add a new one</option>
-        {metrics.map( metric => <option key={metric}>{metric}</option> )}
+        <option key={ANOTHER} value=''>Add a new one</option>
+        {!!metrics && metrics.map( metric => <option key={metric}>{metric}</option> )}
       </Select>
     </FormControl>
   )

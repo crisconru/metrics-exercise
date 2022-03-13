@@ -1,21 +1,13 @@
 import { createContext } from "react";
-import { AverageData, AveragesFetched, Metric, SearchFilter } from "../interfaces/interfaces";
+import { AveragesState, Metric, MetricsState, SearchFilter } from "../interfaces/interfaces";
 
-export interface AveragesData {
-    timeFilter: SearchFilter,
-    timestamp: number,
-}
 
 export interface MetricsStateContex {
-    selectedMetric: string
-    setSelectedMetric: (metric: string) => void
-    metrics: string[],
+    metrics: MetricsState,
     getMetrics: () => void
     postMetrics: (mtcs: Metric[]) => void
-    // averagesData: AverageData[]
-    timestamps: number[]
-    info: AverageData[]
-    getAverages: (search: AveragesData) => void
+    averages: AveragesState
+    getAverages: (start: number, end: number, search: SearchFilter) => void
 }
 
 export const MetricsContext = createContext<MetricsStateContex>({} as MetricsStateContex)
