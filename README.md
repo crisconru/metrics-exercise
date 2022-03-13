@@ -4,43 +4,30 @@ This is a Proof of Concept -> Post and display metrics from frontend to a backen
 
 The structure is a monorepo split in frontend and backend (an API).
 
-The project is far to be functional and completed. The author is not proud with the final result but it is what it is.
-
-Backend is more or less completed:
+Backend is built with FastAPI (Python). It has these features:
 
 - [x] Gets metrics.
 - [x] Post metrics to backend.
-- [x] Get averages of metrics by day, hour, minute with a timestamp.
-- [] Websocket to have realtime communication.
+- [x] Get averages of metrics by day, hour, minute with a range timestamp.
 
-API has an OpenAPI docs at the endpoins `/docs` and `/redoc`.
+The API has an OpenAPI docs at the endpoins `/docs` and `/redoc`.
 
-Frontend is incompleted:
+Frontend is built with React (TypeScript) + Chakra UI (styles) + React-Vis (charts). Ith has these features:
 
 - [x] Gets metrics.
 - [x] Post metrics.
-- [] Get averages of metrics by day, hour, minute with a timestamp (this goal is half done).
-- [] Display averages in an usable way (like a Time-Series chart).
-- [] UI not horrible and responsive.
-- [] Websocket to have realtime updates of the averages.
+- [x] Get averages of metrics by day, hour, minute with a range timestamp.
+- [x] Display averages in a Time-Series chart.
+- [x] Responsive UI.
 
 The project can be run in two ways:
 
-1. docker-compose
-2. Installing and running each service separately
-
-## Docker-Compose
-
-If you choose this option, run `docker-compose up` and you get:
-
-- Frontend at 3333 port
-- Backend at 8888 port
-
-With docker-compose the project doesn't work well because an unresolved (by me) issue with CORS.
+1. Installing and running each service separately
+2. docker-compose
 
 ## Each service separately
 
-This option at least work (with incomplete project) but need some steps. The two services need to run in the same machine because the CORS problem doesn't affect with localhost.
+This option need some steps. The two services need to run in the same machine because there is a CORS with backend (it doesn't affect with localhost).
 
 ### Backend
 
@@ -57,3 +44,12 @@ The front was developed with NODE 16. Is the typical project made with `create-r
 Before run please modify at `src/context/MetricsProvider.tsx`. You need to set `BACKEND` const to the correct backend url. If you use `dev.env` with backend, uncomment the first `BACKEND` const and comment the second.
 
 Then you can start with `npm start`.
+
+## Docker-Compose
+
+If you choose this option, run `docker-compose up` and you get:
+
+- Frontend at 3333 port
+- Backend at 8888 port
+
+With docker-compose the project doesn't work well because an unresolved (by me) issue with CORS.
